@@ -1,0 +1,16 @@
+services:
+  us-visa-bot:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Required
+      - CURRENT_DATE=2024-06-15
+      # Optional
+      - TARGET_DATE=
+      - MIN_DATE=
+      # Comma-separated ranges: "2024-05-01:2024-05-10,2024-06-01:2024-06-15"
+      - DATE_RANGES=
+      - STOP_AFTER_BOOK=false
+      - DRY_RUN=false

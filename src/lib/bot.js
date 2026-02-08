@@ -1,5 +1,6 @@
 import { VisaHttpClient } from './client.js';
 import { log } from './utils.js';
+import { isDateInRanges } from './dateRanges.js';
 
 export class Bot {
   constructor(config, options = {}) {
@@ -13,7 +14,7 @@ export class Bot {
     return await this.client.login();
   }
 
-  async checkAvailableDate(sessionHeaders, currentBookedDate, minDate) {
+  async checkAvailableDate(sessionHeaders, currentBookedDate, minDate, dateRanges = []) {
     const dates = await this.client.checkAvailableDate(
       sessionHeaders,
       this.config.scheduleId,
@@ -34,6 +35,11 @@ export class Bot {
 
       if (minDate && date < minDate) {
         log(`date ${date} is before minimum date (${minDate})`);
+        return false;
+      }
+
+      if (!isDateInRanges(date, dateRanges)) {
+        log(`date ${date} is outside allowed ranges`);
         return false;
       }
 

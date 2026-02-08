@@ -14,6 +14,8 @@ program
   .requiredOption('-c, --current <date>', 'current booked date')
   .option('-t, --target <date>', 'target date to stop at')
   .option('-m, --min <date>', 'minimum date acceptable')
+  .option('-r, --range <range>', 'acceptable date range (YYYY-MM-DD:YYYY-MM-DD). Can be repeated.', (val, prev) => (prev ? [...prev, val] : [val]))
+  .option('--stop-after-book', 'stop after a successful booking to avoid multiple reschedules')
   .option('--dry-run', 'only log what would be booked without actually booking')
   .action(botCommand);
 
@@ -22,6 +24,8 @@ program
   .requiredOption('-c, --current <date>', 'current booked date')
   .option('-t, --target <date>', 'target date to stop at')
   .option('-m, --min <date>', 'minimum date acceptable')
+  .option('-r, --range <range>', 'acceptable date range (YYYY-MM-DD:YYYY-MM-DD). Can be repeated.', (val, prev) => (prev ? [...prev, val] : [val]))
+  .option('--stop-after-book', 'stop after a successful booking to avoid multiple reschedules')
   .option('--dry-run', 'only log what would be booked without actually booking')
   .action(botCommand);
 

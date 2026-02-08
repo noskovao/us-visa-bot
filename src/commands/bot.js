@@ -1,6 +1,7 @@
 import { Bot } from '../lib/bot.js';
 import { getConfig } from '../lib/config.js';
 import { log, sleep, isSocketHangupError } from '../lib/utils.js';
+import { parseDateRanges } from '../lib/dateRanges.js';
 
 const COOLDOWN = 3600; // 1 hour in seconds
 
@@ -10,6 +11,7 @@ export async function botCommand(options) {
   let currentBookedDate = options.current;
   const targetDate = options.target;
   const minDate = options.min;
+  let dateRanges = [];
 
   log(`Initializing with current date ${currentBookedDate}`);
 
@@ -26,13 +28,25 @@ export async function botCommand(options) {
   }
 
   try {
+    dateRanges = parseDateRanges(options.range);
+  } catch (err) {
+    log(`Invalid date range: ${err.message}`);
+    process.exit(1);
+  }
+
+  if (dateRanges.length > 0) {
+    log(`Acceptable date ranges: ${dateRanges.map(r => r.raw).join(', ')}`);
+  }
+
+  try {
     const sessionHeaders = await bot.initialize();
 
     while (true) {
       const availableDate = await bot.checkAvailableDate(
         sessionHeaders,
         currentBookedDate,
-        minDate
+        minDate,
+        dateRanges
       );
 
       if (availableDate) {
@@ -46,6 +60,11 @@ export async function botCommand(options) {
             ...options,
             current: currentBookedDate
           };
+
+          if (options.stopAfterBook) {
+            log(`Booked appointment on ${availableDate}. Exiting because --stop-after-book is set.`);
+            process.exit(0);
+          }
 
           if (targetDate && availableDate <= targetDate) {
             log(`Target date reached! Successfully booked appointment on ${availableDate}`);

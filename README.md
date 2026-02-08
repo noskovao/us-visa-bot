@@ -63,7 +63,7 @@ REFRESH_DELAY=3
 Run the bot with your current appointment date:
 
 ```bash
-node index.js -c <current_date> [-t <target_date>] [-m <min_date>]
+node src/index.js -c <current_date> [-t <target_date>] [-m <min_date>] [--range <start:end>...]
 ```
 
 ### Command Line Arguments
@@ -73,24 +73,34 @@ node index.js -c <current_date> [-t <target_date>] [-m <min_date>]
 | `-c` | `--current` | ✅ | Your current booked interview date (YYYY-MM-DD) |
 | `-t` | `--target` | ❌ | Target date to stop at - exits successfully when reached |
 | `-m` | `--min` | ❌ | Minimum acceptable date - skips dates before this |
+| `-r` | `--range` | ❌ | Acceptable date range (YYYY-MM-DD:YYYY-MM-DD). Can be repeated |
+|  | `--stop-after-book` | ❌ | Stop after the first successful booking |
 
 ### Examples
 
 ```bash
 # Basic usage - reschedule to any earlier date
-node index.js -c 2023-06-15
+node src/index.js -c 2023-06-15
 
 # With target date - stop when you get June 1st or earlier  
-node index.js -c 2023-06-15 -t 2023-06-01
+node src/index.js -c 2023-06-15 -t 2023-06-01
 
 # With minimum date - only accept dates after May 1st
-node index.js -c 2023-06-15 -m 2023-05-01
+node src/index.js -c 2023-06-15 -m 2023-05-01
 
 # With both constraints - only book between May 1st and June 1st
-node index.js -c 2023-06-15 -t 2023-06-01 -m 2023-05-01
+node src/index.js -c 2023-06-15 -t 2023-06-01 -m 2023-05-01
+
+# Multiple ranges - only accept dates in May 1-10 or June 1-15
+node src/index.js -c 2023-06-15 \
+  --range 2023-05-01:2023-05-10 \
+  --range 2023-06-01:2023-06-15
+
+# Stop after first successful booking
+node src/index.js -c 2023-06-15 --stop-after-book
 
 # Get help
-node index.js --help
+node src/index.js --help
 ```
 
 ## How It Behaves
@@ -103,7 +113,7 @@ The bot will:
    - Must be after minimum date (`-m`) if specified
    - Will exit successfully if target date (`-t`) is reached
 4. **Book** the appointment automatically if conditions are met
-5. **Continue** monitoring until target is reached or manually stopped
+5. **Continue** monitoring until target is reached or manually stopped (or stop immediately if `--stop-after-book` is set)
 
 ## Output Examples
 
@@ -122,8 +132,29 @@ The bot will:
 - ✅ **Read-only until booking** - Only books when better dates are found
 - ✅ **Respects constraints** - Won't book outside your specified date range
 - ✅ **Graceful exit** - Stops automatically when target is reached
+- ✅ **Optional single-book mode** - Use `--stop-after-book` to avoid multiple reschedules
 - ✅ **Error recovery** - Automatically retries on network errors
 - ✅ **Secure credentials** - Uses environment variables for sensitive data
+
+## Docker (including TrueNAS)
+
+You can run the bot continuously in Docker using the included `Dockerfile` and `docker-compose.yml`. The compose file is set to restart the container automatically (`restart: unless-stopped`).
+
+1. Create your `.env` file as described above.
+2. Edit `docker-compose.yml` and set:
+   - `CURRENT_DATE` (required)
+   - `TARGET_DATE`, `MIN_DATE` (optional)
+   - `DATE_RANGES` (optional, comma-separated, e.g. `2024-05-01:2024-05-10,2024-06-01:2024-06-15`)
+   - `STOP_AFTER_BOOK` and/or `DRY_RUN` if desired
+3. Build and run:
+```bash
+docker compose up -d --build
+```
+
+### TrueNAS notes
+
+- On TrueNAS SCALE, you can use the built-in Docker/Apps system or a Compose app. Point it at this repository and set the same environment variables shown above.
+- Make sure the container has a persistent `.env` and that `restart: unless-stopped` (or the UI equivalent) is enabled so it runs continuously.
 
 ## Contributing
 
