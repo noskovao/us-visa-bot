@@ -1,7 +1,7 @@
 services:
   us-visa-bot:
     build: .
-    restart: unless-stopped
+    restart: on-failure
     env_file:
       - .env
     environment:

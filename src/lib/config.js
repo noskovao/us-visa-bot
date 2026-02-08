@@ -9,7 +9,11 @@ export function getConfig() {
     scheduleId: process.env.SCHEDULE_ID,
     facilityId: process.env.FACILITY_ID,
     countryCode: process.env.COUNTRY_CODE,
-    refreshDelay: Number(process.env.REFRESH_DELAY || 3)
+    refreshDelay: Number(process.env.REFRESH_DELAY || 3),
+    authRetryDelaySeconds: Number(process.env.AUTH_RETRY_DELAY || 10),
+    authRetryMax: Number(process.env.AUTH_RETRY_MAX || 5),
+    authRetryBackoff: Number(process.env.AUTH_RETRY_BACKOFF || 2),
+    authRetryMaxDelaySeconds: Number(process.env.AUTH_RETRY_MAX_DELAY || 300)
   };
 
   validateConfig(config);

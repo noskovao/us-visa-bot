@@ -45,6 +45,10 @@ COUNTRY_CODE=your_country_code
 SCHEDULE_ID=your_schedule_id
 FACILITY_ID=your_facility_id
 REFRESH_DELAY=3
+AUTH_RETRY_DELAY=10
+AUTH_RETRY_MAX=5
+AUTH_RETRY_BACKOFF=2
+AUTH_RETRY_MAX_DELAY=300
 ```
 
 ### Finding Your Configuration Values
@@ -57,6 +61,10 @@ REFRESH_DELAY=3
 | `SCHEDULE_ID` | Your appointment schedule ID | Found in URL when rescheduling: <br>`https://ais.usvisa-info.com/en-{COUNTRY_CODE}/niv/schedule/{SCHEDULE_ID}/continue_actions` |
 | `FACILITY_ID` | Your consulate facility ID | Found in network calls when selecting dates, or inspect the date selector dropdown <br>Example: Paris = `44` |
 | `REFRESH_DELAY` | Seconds between checks | Optional, defaults to 3 seconds |
+| `AUTH_RETRY_DELAY` | Seconds to wait before retrying after auth errors | Optional, defaults to 10 seconds |
+| `AUTH_RETRY_MAX` | Max consecutive auth retries before a cooldown | Optional, defaults to 5 (0 = never cooldown) |
+| `AUTH_RETRY_BACKOFF` | Backoff multiplier for auth retry delay | Optional, defaults to 2 |
+| `AUTH_RETRY_MAX_DELAY` | Maximum auth retry delay in seconds | Optional, defaults to 300 seconds |
 
 ## Usage
 
@@ -138,7 +146,7 @@ The bot will:
 
 ## Docker (including TrueNAS)
 
-You can run the bot continuously in Docker using the included `Dockerfile` and `docker-compose.yml`. The compose file is set to restart the container automatically (`restart: unless-stopped`).
+You can run the bot continuously in Docker using the included `Dockerfile` and `docker-compose.yml`. The compose file is set to restart the container on failures only (`restart: on-failure`), so a successful booking with `--stop-after-book` will stop the container.
 
 1. Create your `.env` file as described above.
 2. Edit `docker-compose.yml` and set:
