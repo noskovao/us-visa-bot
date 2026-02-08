@@ -49,6 +49,7 @@ AUTH_RETRY_DELAY=10
 AUTH_RETRY_MAX=5
 AUTH_RETRY_BACKOFF=2
 AUTH_RETRY_MAX_DELAY=300
+PREFERRED_WEEKDAYS=mon,tue
 ```
 
 ### Finding Your Configuration Values
@@ -65,6 +66,7 @@ AUTH_RETRY_MAX_DELAY=300
 | `AUTH_RETRY_MAX` | Max consecutive auth retries before a cooldown | Optional, defaults to 5 (0 = never cooldown) |
 | `AUTH_RETRY_BACKOFF` | Backoff multiplier for auth retry delay | Optional, defaults to 2 |
 | `AUTH_RETRY_MAX_DELAY` | Maximum auth retry delay in seconds | Optional, defaults to 300 seconds |
+| `PREFERRED_WEEKDAYS` | Prefer bookings on these weekdays when multiple dates are available | Optional, accepts `mon,tue,...` or `0..6` (0=Sun) |
 
 ## Usage
 
@@ -120,6 +122,8 @@ The bot will:
    - Must be earlier than current date (`-c`)
    - Must be after minimum date (`-m`) if specified
    - Will exit successfully if target date (`-t`) is reached
+   - If `DATE_RANGES` is provided, the first range in the list has priority
+   - If `PREFERRED_WEEKDAYS` is set, it prefers those weekdays within the chosen range
 4. **Book** the appointment automatically if conditions are met
 5. **Continue** monitoring until target is reached or manually stopped (or stop immediately if `--stop-after-book` is set)
 

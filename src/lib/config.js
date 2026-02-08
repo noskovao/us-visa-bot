@@ -13,7 +13,11 @@ export function getConfig() {
     authRetryDelaySeconds: Number(process.env.AUTH_RETRY_DELAY || 10),
     authRetryMax: Number(process.env.AUTH_RETRY_MAX || 5),
     authRetryBackoff: Number(process.env.AUTH_RETRY_BACKOFF || 2),
-    authRetryMaxDelaySeconds: Number(process.env.AUTH_RETRY_MAX_DELAY || 300)
+    authRetryMaxDelaySeconds: Number(process.env.AUTH_RETRY_MAX_DELAY || 300),
+    preferredWeekdays: (process.env.PREFERRED_WEEKDAYS || '')
+      .split(',')
+      .map(v => v.trim())
+      .filter(Boolean)
   };
 
   validateConfig(config);
